@@ -1,0 +1,279 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using HtmlAgilityPack;
+using Login;
+
+public partial class Site_Default2 : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+
+        if (LoginUsuario._Id_Usuario != 0)
+        {
+            // Faz consulta para recuperar os códigos do usuário logado
+            CodigoRastreioEntidade codigoRastreioModelo = new CodigoRastreioEntidade();
+
+            codigoRastreioModelo.id_usuario = LoginUsuario._Id_Usuario;
+
+            if (Request.QueryString["pID_CODIGO_RASTREIO"] != null)
+            {
+
+                codigoRastreioModelo.Id_Codigo_Rastreio = Convert.ToInt32(Request.QueryString["pID_CODIGO_RASTREIO"]);
+                // Altera a flag da linha no banco pra 1 só são exibidos códigos com valor 1 no grid
+                int retornoBD = this.AlterarViewCodigo(codigoRastreioModelo);
+            }
+
+            // Busca os códigos no bd
+            List<CodigoRastreioEntidade> lstCodigos = this.ConsultaCodigo(codigoRastreioModelo);
+
+            this.dadosRastreio(lstCodigos);
+
+            // Monta o grid com os códigos de retorno
+            gdv_Encomendas.DataSource = lstCodigos;
+            gdv_Encomendas.DataBind();
+        }
+        else
+        {
+            this.dados.Visible = false;
+            Response.Write("<script language='javascript'>alert('Erro na operação! Efetue o seu login para ter acesso a essa área.');location.href='/Site/Login.aspx';</script>");
+        }
+
+    }
+    protected void btnSubmeter_Click(object sender, EventArgs e)
+    {
+        if (LoginUsuario._Id_Usuario != 0)
+        {
+            // insere o código informado no bd
+            CodigoRastreioEntidade codigo = new CodigoRastreioEntidade();
+            codigo.codigo = txtCodigo.Text.ToUpper();
+            codigo.id_usuario = LoginUsuario._Id_Usuario;
+
+
+            //Antes de cadastrar verifica se o código já está cadastrado na base
+            bool retornoCodigo = this.ConfirmaCadastroCodigo(codigo);
+
+            if (!retornoCodigo)
+            {
+                // se for código novo cadastra no bd
+                int retornoBD = 0;
+
+                CodigoRastreioNegocio codigoNegocio = new CodigoRastreioNegocio();
+
+                retornoBD = codigoNegocio.CadastraCodigoRastreio(codigo);
+
+
+                if (retornoBD != -1)
+                {
+                    this.LimpaControles();
+                    Response.Write("<script language='javascript'>alert('O Código informado foi cadastrado com sucesso.');location.href='/Site/MinhasEncomendas.aspx';</script>");
+                }
+                else
+                {
+                    this.LimpaControles();
+                    Response.Write("<script language='javascript'>alert('Erro na operação! Contate o suporte! Falha ao tentar efetuar o cadastro do código informado no BD.');location.href='/Site/MinhasEncomendas.aspx';</script>");
+                }
+
+            }
+            else
+            {
+                this.LimpaControles();
+                Response.Write("<script language='javascript'>alert('Erro na operação! O Código informado já possui cadastro no sistema.');location.href='/Site/MinhasEncomendas.aspx';</script>");
+            }
+
+        }
+        else
+        {
+            //lblResultado.Visible = true;
+            //lblResultado.Text = "Erro na operação! Esqueceu a sua senha? Efetue a troca da sua senha clicando em Esqueci a minha senha.";
+            //lblResultado.ForeColor = Color.DarkRed;
+            Response.Write("<script language='javascript'>alert('Erro na operação! Efetue login para ter acesso a está sessão.');location.href='/Site/Login.aspx';</script>");
+
+        }
+
+    }
+
+    private List<CodigoRastreioEntidade> dadosRastreio(List<CodigoRastreioEntidade> LstCodigo)
+    {
+        this.dados.Visible = true;
+        // a consulta no banco de dados retornando todos os códigos do usuario logado
+        // Aplica campos de parâmetros
+        for (int i = 0; i < LstCodigo.Count(); i++)
+        {
+            string codigo = LstCodigo.ToList()[i].codigo;
+            string parametros = "?P_COD_UNI=" + codigo + "&P_LINGUA=001&P_TIPO=001";
+            // Cria o objeto de requisição
+            WebRequest requisicao = WebRequest.Create("http://websro.correios.com.br/sro_bin/txect01$.QueryList" + parametros);
+            // Realiza a requisição
+            HttpWebResponse retorno = (HttpWebResponse)requisicao.GetResponse();
+            // Lê o objeto e faz a atribuição à variável
+            StreamReader stream = new StreamReader(retorno.GetResponseStream(), Encoding.GetEncoding("ISO-8859-1"));
+            string dados = stream.ReadToEnd();
+            // Transforma em um documento HTML - HtmlAgilityPack
+            HtmlDocument html = new HtmlDocument();
+            html.LoadHtml(dados);
+            // Captura apenas a tabela contendo os dados do envio
+            HtmlNode tabela = html.DocumentNode.SelectSingleNode("//table");
+
+            // Confirmar a nacionalidade do pacote para adicionar o icone de onde vem a entrega no grid
+            if (codigo.Substring(11, 2) == "BR")
+            {
+                LstCodigo.ToList()[i].imagemNacionalidade = "br.jpg";
+            }
+            else if (codigo.Substring(11, 2) == "US")
+            {
+                LstCodigo.ToList()[i].imagemNacionalidade = "us.png";
+            }
+            else if (codigo.Substring(11, 2) == "HK")
+            {
+                LstCodigo.ToList()[i].imagemNacionalidade = "hk.png";
+            }
+            else if (codigo.Substring(11, 2) == "CN")
+            {
+                LstCodigo.ToList()[i].imagemNacionalidade = "cn.png";
+            }
+
+            if (tabela != null)
+            {
+                // Nesse caso você pode capturar as colunas e linhas e trabalhar conforme desejar
+                // Apenas fiz o loop para remover a formatação inicial da tabela
+                //string htmlTable = "<table>";
+                // Extrai as linhas da tabela
+                int contador = i;
+                foreach (HtmlNode linha in tabela.SelectNodes("//tr"))
+                {
+                    string situacao = linha.InnerHtml;
+                    int posicao1 = situacao.IndexOf("Entrega");
+
+                    if (posicao1 != -1)
+                    {
+                        if (posicao1 == 95 || posicao1 == 91 || posicao1 == 101)
+                        {
+                            LstCodigo.ToList()[i].situacao = "Entregaefetuada";
+                            LstCodigo.ToList()[i].imagem = "entregue.png";
+                            LstCodigo.ToList()[i].imagemBrasil = "icon_brasil.jpg";
+                            break;
+                        }
+                    }
+
+                    int posicao2 = situacao.IndexOf("Encaminhado");
+                    if (posicao2 != -1)
+                    {
+                        if (posicao2 == 16)
+                        {
+                            LstCodigo.ToList()[i].situacao = "Encaminhado";
+                            LstCodigo.ToList()[i].imagem = "encaminhado.jpg";
+                            LstCodigo.ToList()[i].imagemBrasil = "icon_brasil.jpg";
+                            break;
+                        }
+                    }
+
+                    int posicao3 = situacao.IndexOf("trânsito");
+                    if (posicao3 != -1)
+                    {
+                        if (posicao3 == 19)
+                        {
+                            LstCodigo.ToList()[i].situacao = "Em trânsito";
+                            LstCodigo.ToList()[i].imagem = "transito.jpg";
+                            LstCodigo.ToList()[i].imagemBrasil = "icon_brasil.jpg";
+                            break;
+                        }
+                    }
+
+                    int posicao4 = situacao.IndexOf("Postado");
+                    if (posicao4 != -1)
+                    {
+                        if (posicao4 == 92)
+                        {
+                            LstCodigo.ToList()[i].situacao = "Postado Depois";
+                            LstCodigo.ToList()[i].imagem = "depois.jpg";
+                            LstCodigo.ToList()[i].imagemBrasil = "icon_brasil.jpg";
+                            break;
+                        }
+                    }
+
+                    int posicao5 = situacao.IndexOf("sujeito");
+                    if (posicao5 != -1)
+                    {
+                        if (posicao5 == 23)
+                        {
+                            LstCodigo.ToList()[i].situacao = "Objeto sujeito";
+                            LstCodigo.ToList()[i].imagem = "sujeito.jpg";
+                            LstCodigo.ToList()[i].imagemBrasil = "icon_brasil.jpg";
+                            break;
+                        }
+                    }
+
+                    LstCodigo.ToList()[i].situacao = "Informação indisponível";
+                    LstCodigo.ToList()[i].imagem = "infoNaoDisponivel.png";
+                    LstCodigo.ToList()[i].imagemBrasil = "icon_brasil.jpg";
+                }
+            }
+            else
+            {
+                LstCodigo.ToList()[i].situacao = "Informação indisponível";
+                LstCodigo.ToList()[i].imagem = "infoNaoDisponivel.png";
+                LstCodigo.ToList()[i].imagemBrasil = "icon_brasil.jpg";
+            }
+            
+            stream.Close();
+            retorno.Close();
+        }
+
+        return LstCodigo;
+    }
+
+    private bool ConfirmaCadastroCodigo(CodigoRastreioEntidade codigoCadastro)
+    {
+        bool CodigoCadastrado = false;
+
+        // Efetua a cosulta no banco
+        CodigoRastreioNegocio consultaCadastroCodigo = new CodigoRastreioNegocio();
+
+        CodigoCadastrado = consultaCadastroCodigo.ConfirmaCadastro(codigoCadastro);
+
+        return CodigoCadastrado;
+
+    }
+
+    private List<CodigoRastreioEntidade> ConsultaCodigo(CodigoRastreioEntidade codigoCadastro)
+    {
+        List<CodigoRastreioEntidade> lstCodigos = new List<CodigoRastreioEntidade>();
+
+        // Efetua a cosulta no banco
+        CodigoRastreioNegocio consultaCodigoNegocio = new CodigoRastreioNegocio();
+
+        lstCodigos = consultaCodigoNegocio.ConsultaCodigoCadastrados(codigoCadastro);
+
+        return lstCodigos;
+
+    }
+
+    private int AlterarViewCodigo(CodigoRastreioEntidade codigoCadastro)
+    {
+        int retornoBD = 0;
+
+        CodigoRastreioNegocio consultaCadastroCodigo = new CodigoRastreioNegocio();
+
+        retornoBD = consultaCadastroCodigo.AlterarViewCodigo(codigoCadastro);
+    
+       return retornoBD;
+    }
+
+    private void LimpaControles()
+    {
+        txtCodigo.Text = string.Empty;
+    }
+
+    protected void gdv_Encomendas_RowCommand(object sender, GridViewCommandEventArgs e)
+    {
+        if (e.CommandName.Equals("Editar")) { string idProduto = e.CommandArgument.ToString(); if (!String.IsNullOrEmpty(idProduto)) this.Response.Redirect("DetalheProduto.aspx?IdProduto=" + idProduto); }
+    }
+}

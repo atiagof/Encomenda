@@ -1,0 +1,60 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/MasterPageEncomenda.master" AutoEventWireup="true" CodeFile="Contato.aspx.cs" Inherits="Site_Default2" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
+    <table align="center">
+        <tr>
+            <td colspan="2">
+                <div style="border: 1px solid #CCCCCC; padding: 10px;">
+                    <asp:Label ID="Label1" runat="server" Text="" class="header">CONTATO</asp:Label>
+                    <table cellpadding="0" cellspacing="30" style="background-color: White">
+                        <tr>
+                            <td>Nome:</td>
+                            <td>
+                                <asp:TextBox ID="txtNome" runat="server" CssClass="validate[required]" /></td>
+                        </tr>
+                        <tr>
+                            <td>Email:</td>
+                            <td>
+                                <asp:TextBox ID="txtEmail" runat="server" CssClass="validate[required,custom[email]" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Tipo contato:</td>
+                            <td>
+                                <asp:DropDownList ID="ddlContatoSituacao" runat="server" CssClass="validate[required] radio">
+                                    <asp:ListItem Value="">Selecione</asp:ListItem>
+                                    <asp:ListItem Value="1">Movimentação no Exterior</asp:ListItem>
+                                    <asp:ListItem Value="2">Recebido / Conferido no Brasil</asp:ListItem>
+                                    <asp:ListItem Value="3">Saiu para entrega</asp:ListItem>
+                                    <asp:ListItem Value="4">Aguardando Retirada</asp:ListItem>
+                                    <asp:ListItem Value="5">Entregue</asp:ListItem>
+                                    <asp:ListItem Value="6">Objeto possivelmente tributado</asp:ListItem>
+                                    <asp:ListItem Value="7">Marcar um pacote como entregue</asp:ListItem>
+                                    <asp:ListItem Value="8">Desmarcar um pacote como entregue</asp:ListItem>
+                                </asp:DropDownList>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Mensagem:</td>
+                            <td>
+                                <asp:TextBox ID="txtMensagem" TextMode="MultiLine" runat="server" Columns="35" Rows="5" CssClass="validate[required]" ></asp:TextBox>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>
+                                <asp:Button ID="btnSubmeter" runat="server" Text="Enviar" OnClick="btnSubmeter_Click" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <asp:Label ID="lblResultado" runat="server" Font-Bold="True" />
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+    </table>
+</asp:Content>
+

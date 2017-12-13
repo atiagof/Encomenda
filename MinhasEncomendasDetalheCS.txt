@@ -1,0 +1,63 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using HtmlAgilityPack;
+using Login;
+
+public partial class Site_MinhasEncomendasDetalhe : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (LoginUsuario._Id_Usuario != 0)
+        {
+            this.dados.Visible = true;
+            // a consulta no banco de dados retornando todos os códigos do usuario logado
+            // Aplica campos de parâmetros
+            string codigo = Request.QueryString["pcodigo"];
+            string parametros = "?P_COD_UNI=" + codigo + "&P_LINGUA=001&P_TIPO=001";
+            // Cria o objeto de requisição
+            WebRequest requisicao = WebRequest.Create("http://websro.correios.com.br/sro_bin/txect01$.QueryList" + parametros);
+            // Realiza a requisição
+            HttpWebResponse retorno = (HttpWebResponse)requisicao.GetResponse();
+            // Lê o objeto e faz a atribuição à variável
+            StreamReader stream = new StreamReader(retorno.GetResponseStream(), Encoding.GetEncoding("ISO-8859-1"));
+            string dados = stream.ReadToEnd();
+            // Transforma em um documento HTML - HtmlAgilityPack
+            HtmlDocument html = new HtmlDocument();
+            html.LoadHtml(dados);
+            // Captura apenas a tabela contendo os dados do envio
+            HtmlNode tabela = html.DocumentNode.SelectSingleNode("//table");
+
+            if (tabela != null)
+            {
+                // Nesse caso você pode capturar as colunas e linhas e trabalhar conforme desejar
+                // Apenas fiz o loop para remover a formatação inicial da tabela
+                string htmlTable = "<table>";
+                // Extrai as linhas da tabela
+                foreach (HtmlNode linha in tabela.SelectNodes("//tr"))
+                    htmlTable += "<tr>" + linha.InnerHtml + "</tr>";
+                htmlTable += "</table>";
+
+                //Exibe a tabela de rastreamento
+                lblRetornoCorreio.Text = "O horário não indica quando a situação ocorreu, mas sim quando os dados foram recebidos pelo sistema, exceto no caso do <b>SEDEX 10 e do SEDEX Hoje, </b>em que ele  representa o horário real da entrega.<br><br>" + htmlTable;
+            }
+            else
+                lblRetornoCorreio.Text = "O nosso sistema não possui dados sobre o objeto informado. Se o objeto foi postado recentemente, é natural que seus rastros não tenham ingressado no sistema, nesse caso, por favor, tente novamente mais tarde. Adicionalmente, verifique se o código digitado está correto: " + codigo;
+
+            // Finaliza objetos
+            stream.Close();
+            retorno.Close();
+        }
+        else 
+        {
+            // Solicita login e redireciona o usuário para a home.
+            Response.Write("<script language='javascript'>alert('Erro na operação! Efetue o seu login para ter acesso a essa área.');location.href='/Site/Login.aspx';</script>");
+        }
+    }
+}

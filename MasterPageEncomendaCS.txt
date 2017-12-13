@@ -1,0 +1,35 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using Login;
+
+public partial class MasterPageEncomenda : System.Web.UI.MasterPage
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        int IdLogoff = 0;
+        IdLogoff = Convert.ToInt32(Request.QueryString["logoff"]);
+
+        if (IdLogoff == 1)
+        {
+            LoginUsuario._Id_Usuario = 0;
+            LoginUsuario._Usuario_Nome = string.Empty;
+        }
+        
+        if (LoginUsuario._Id_Usuario != 0)
+        {
+            this.liLogin.Visible = false;
+            this.lblNomeLogin.Visible = true;
+            this.aHref.Visible = true;
+            this.lblNomeLogin.Text = "Seja bem Vindo! " + "<b>" + Convert.ToString(LoginUsuario._Usuario_Nome).ToUpper() + "</b>";
+        }
+        else
+        {
+            this.lblNomeLogin.Visible = false;
+            this.aHref.Visible = false;
+        }
+    }
+}

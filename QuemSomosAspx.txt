@@ -1,0 +1,13 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/MasterPageEncomenda.master" AutoEventWireup="true" CodeFile="QuemSomos.aspx.cs" Inherits="Site_Default2" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
+    <p>
+        O Encomendas.com é um site criado com a finalidade de ajudar compradores brasileiros a registrarem e gerenciar suas encomendas de forma prática, eficiente e rápida!
+    </p>
+    <p>
+        A ideia do Site foi concebida por dois universitários que identificaram uma deficiência em relação a uma ferramenta que permitisse o controle de encomendas (sejam internacionais ou nacionais) que também permitisse uma maior interação entre os usuários cadastrados.
+    </p>
+    <p>
+        Basicamente a ideia é oferecer um local seguro e eficiente para registrar e controlar suas encomendas oferecendo também a possibilidade de troca de informações entre os usuários cadastrados criando assim uma grande comunidade!
+    </p>
+</asp:Content>

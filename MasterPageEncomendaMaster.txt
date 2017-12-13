@@ -1,0 +1,76 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="MasterPageEncomenda.master.cs" Inherits="MasterPageEncomenda" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>Encomendas.com</title>
+    <script src="/Scripts/jquery-1.11.1.js" type="text/javascript"></script>
+    <script src="/Scripts/jquery.validate.js" type="text/javascript"></script>
+    <script src="/Scripts/mascara.js" type="text/javascript"></script>
+    <script src="/Scripts/jquery-1.6.min.js" type="text/javascript"></script>
+    <script src="/Scripts/jquery.validationEngine-pt_BR.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/Scripts/jquery.validationEngine.js" type="text/javascript" charset="utf-8"></script>
+    <style type="text/css">
+        @import url('/EstiloCssSite/template.css');
+        @import url('/EstiloCssSite/EstiloMasterPageEncomendaPrincipal.css');
+        @import url('/EstiloCssSite/validationEngine.jquery.css');
+    </style>
+    <style type="text/css" media="screen">
+        /* FORMULÁRIO */
+        .defaultText
+        {
+            font-style: italic;
+            color: #000066;
+        }
+
+        .header
+        {
+            background-color: #00009C;
+            font-weight: bold;
+            color: White;
+            text-align: center;
+        }
+
+        .alertmsg
+        {
+            color: #FF0000;
+        }
+    </style>
+    <script language="javascript" type="text/javascript">
+        jQuery(document).ready(function () {
+            jQuery("#form1").validationEngine();
+        });
+    </script>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div id="geral">
+            <div id="cabecalho">
+                <h1>
+                    <a href="/Site/Default.aspx"><img src="/img/gtogames_logo.png" width="20%" height="20%" /></a>
+                </h1>
+            </div>
+            <div id="logado" >
+                <asp:Label runat="server" ID="lblNomeLogin" Text="" style="text-align:right"></asp:Label><a href="/Site/Default.aspx?logoff=1" runat="server" id="aHref"> desconectar.</a>
+            </div>
+            <div id="menu">
+                <ul>
+                    <li><a href="/Site/Default.aspx">Home</a></li>
+                    <li><a href="/Site/MinhasEncomendas.aspx">Minhas encomendas</a></li>
+                    <li><a href="/Site/QuemSomos.aspx">Quem somos</a></li>
+                    <li><a href="/Site/Contato.aspx">Contato</a></li>
+                    <li id="liLogin" runat="server"><a href="/Site/Login.aspx">Login</a></li>
+                </ul>
+            </div>
+            <div id="conteudo">
+                <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+                </asp:ContentPlaceHolder>
+            </div>
+            <div id="rodape">
+                <asp:Label ID="lblRodape" ForeColor="Silver" runat="server" Text="">&copy; 2014 ENCOMENDAS.COM - Todos os direito reservados.</asp:Label>
+            </div>
+        </div>
+    </form>
+</body>
+</html>

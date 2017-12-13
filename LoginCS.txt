@@ -1,0 +1,96 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using Login;
+
+public partial class Site_Default2 : System.Web.UI.Page
+{
+    public int VsIdUsuario
+    {
+        get
+        {
+            if (ViewState["VsIdUsuario"] != null)
+                return Convert.ToInt32(ViewState["VsIdUsuario"]);
+            return 0;
+        }
+        set
+        {
+            ViewState["VsIdUsuario"] = value;
+        }
+    }
+
+    public string VsNomeUsuario
+    {
+        get
+        {
+            if (ViewState["VsNomeUsuario"] != null)
+                return Convert.ToString(ViewState["VsNomeUsuario"]);
+            return string.Empty;
+        }
+        set
+        {
+            ViewState["VsNomeUsuario"] = value;
+        }
+    }
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        //if (ViewState["IdUsuario"]  == null)
+        //{
+        //    Response.Redirect("/Site/cadastro.aspx");
+        //}        // Confimar se o usário atual está logado no sistema se não estiver o usuário é redirecionado ára a página de cadastro
+
+    }
+    protected void btnSubmeter_Click(object sender, EventArgs e)
+    {
+        // Recupera os dados do usuário que está tentando se logar no sistema.
+        UsuarioEntidade usuarioLogin = new UsuarioEntidade();
+
+        usuarioLogin.email = txtLogin.Text.ToLower();
+        usuarioLogin.senha = txtSenha.Text;
+
+        // Objeto para armazenar o retorno do BD
+        UsuarioEntidade UsuarioLogado = new UsuarioEntidade();
+
+        // Encaminha para camada de negócio
+        CadastrarContatoUsuarioNegocio usuarioLogiNegocio = new CadastrarContatoUsuarioNegocio();
+
+        UsuarioLogado = usuarioLogiNegocio.UsuarioLogiNegocio(usuarioLogin);
+
+        // Limpa os controles do form
+        this.LimpaControlesLogin();
+
+        //Verifica o retorono do banco de dados
+        if (UsuarioLogado.id_usuario != int.MinValue)
+        {
+            // armazena o id_usuario na viewstate de controle de usuário logado
+            VsIdUsuario = UsuarioLogado.id_usuario;
+            VsNomeUsuario = UsuarioLogado.nome;
+
+            LoginUsuario._Id_Usuario = VsIdUsuario;
+            LoginUsuario._Usuario_Nome = VsNomeUsuario;
+
+            Response.Redirect("/Site/Default.aspx");
+
+        }
+        else
+        {
+
+            Response.Write("<script language='javascript'>alert('Erro na operação! Dados inválidos para login! Esqueceu a sua senha? Efetue a troca da sua senha clicando em Esqueci a minha senha.');location.href='/Site/Login.aspx';</script>");
+            //lblResultado.Visible = true;
+            //lblResultado.Text = "Erro na operação! Esqueceu a sua senha? Efetue a troca da sua senha clicando em Esqueci a minha senha.";
+            //lblResultado.ForeColor = Color.DarkRed;
+        }
+
+    }
+
+    private void LimpaControlesLogin()
+    {
+        txtLogin.Text = string.Empty;
+        txtSenha.Text = string.Empty;
+    }
+}

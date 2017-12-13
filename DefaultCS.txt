@@ -1,0 +1,24 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using Login;
+
+public partial class Site_Default : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (LoginUsuario._Id_Usuario != 0)
+        {
+            // Caso o usuário esteja logado retira o link da imagem para a página de cadastro
+            hrefCadastro.HRef = "#";
+        }
+        else
+        {
+            // Caso contrario o usuário pode clicar e efetuar o cadastro.
+            hrefCadastro.HRef = "/site/Cadastro.aspx";        
+        }
+    }
+}

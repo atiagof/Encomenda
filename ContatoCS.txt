@@ -1,0 +1,55 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+public partial class Site_Default2 : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+
+        if (IsPostBack)
+        {
+            lblResultado.Visible = false;    
+        }
+
+    }
+    protected void btnSubmeter_Click(object sender, EventArgs e)
+    {
+        // Instacia objeto
+        UsuarioEntidade contatoUsuario = new UsuarioEntidade();
+        
+        // Recupera osparametros e monta o objeto
+        contatoUsuario.nome = txtNome.Text;
+        contatoUsuario.email = txtEmail.Text;
+        contatoUsuario.Id_ContatoSituacao = Convert.ToInt32(ddlContatoSituacao.SelectedItem.Value);
+        contatoUsuario.DescricaoContato = txtMensagem.Text;
+
+        // Envia os dado para camada de negocio
+        CadastrarContatoUsuarioNegocio contatoNegocio = new CadastrarContatoUsuarioNegocio();
+        int retorno = -1;
+
+        retorno = contatoNegocio.InsereContatoNegocio(contatoUsuario);
+
+        if (retorno != -1)
+        {
+            // Limpa os controles da tela após o insert
+            this.LimpaControles();
+            
+            // Exibe mesagem na tela após cadastro
+            Response.Write("<script language='javascript'>alert('Contato enviado com sucesso!');location.href='/Site/contato.aspx';</script>");
+        }
+    }
+
+    private void LimpaControles()
+    {
+        txtNome.Text = null;
+        txtEmail.Text = null;
+        txtMensagem.Text = null;
+        ddlContatoSituacao.SelectedIndex = 0;
+    }
+
+}

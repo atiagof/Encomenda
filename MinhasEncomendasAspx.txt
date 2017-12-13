@@ -1,0 +1,67 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/MasterPageEncomenda.master" AutoEventWireup="true" CodeFile="MinhasEncomendas.aspx.cs" Inherits="Site_Default2" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="Server">
+    <meta http-equiv="refresh" content="15;url=/Site/MinhasEncomendas.aspx">
+    <div id="dados" runat="server">
+        <asp:Label ID="lblRetornoCorreio" runat="server" Text=""></asp:Label>
+        <p>
+            <table align="center">
+                <tr>
+                    <td colspan="3">
+                        <div style="border: 1px solid #CCCCCC; padding: 10px;">
+                            <asp:Label ID="Label1" runat="server" Text="" class="header">MINHAS ENCOMENDAS</asp:Label>
+                            <table cellpadding="0" cellspacing="30" style="background-color: White">
+                                <tr>
+                                    <td colspan="3">
+                                        <asp:GridView ID="gdv_Encomendas" runat="server" AutoGenerateColumns="false" OnRowCommand="gdv_Encomendas_RowCommand">
+                                            <Columns>
+                                                <%--<asp:BoundField HeaderText="ID" DataField="ID_CODIGO_RASTREIO"></asp:BoundField>--%>
+                                                <asp:ImageField DataImageUrlField="ImagemBrasil" DataImageUrlFormatString="~/img/{0}">
+                                                    <ControlStyle Width="25px"></ControlStyle>
+
+                                                    <ItemStyle Width="25px"></ItemStyle>
+                                                </asp:ImageField>
+                                                <asp:ImageField DataImageUrlField="imagemNacionalidade" DataImageUrlFormatString="~/img/{0}">
+                                                    <ControlStyle Width="25px"></ControlStyle>
+
+                                                    <ItemStyle Width="25px"></ItemStyle>
+                                                </asp:ImageField>
+                                                <asp:BoundField HeaderText="CODIGO" DataField="CODIGO"></asp:BoundField>
+                                                <asp:BoundField HeaderText="DATA CADASTRO" DataField="DT_CADASTRO"></asp:BoundField>
+                                                <asp:ImageField HeaderText="STATUS" DataImageUrlField="Imagem" DataImageUrlFormatString="~/img/{0}">
+                                                    <ControlStyle Width="25px"></ControlStyle>
+
+                                                    <ItemStyle Width="25px"></ItemStyle>
+                                                </asp:ImageField>
+                                                <asp:HyperLinkField
+                                                    DataNavigateUrlFormatString="/Site/MinhasEncomendasDetalhe.aspx?pcodigo={0}"
+                                                    DataNavigateUrlFields="CODIGO"
+                                                    HeaderText="DETALHES" Text="Detalhe"></asp:HyperLinkField>
+                                                <asp:HyperLinkField DataNavigateUrlFormatString="/Site/MinhasEncomendas.aspx?pID_CODIGO_RASTREIO={0}"
+                                                    DataNavigateUrlFields="ID_CODIGO_RASTREIO"
+                                                    HeaderText="AÇÃO" Text="Excluir"></asp:HyperLinkField>
+                                            </Columns>
+                                        </asp:GridView>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" class="header">Cadastre aqui seus códigos</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3">
+                                        <b>Cógigo rastreio:</b>
+                                        <asp:TextBox ID="txtCodigo" runat="server" CssClass="validate[required,minSize[13]" MaxLength="13" /><asp:Button ID="btnSubmeter" runat="server" Text="Enviar" OnClick="btnSubmeter_Click" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </p>
+    </div>
+    <p style="text-align: center">
+        <asp:Label ID="lblResultado" runat="server" Font-Bold="True" />
+    </p>
+</asp:Content>
+

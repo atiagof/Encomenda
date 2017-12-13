@@ -1,0 +1,60 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/MasterPageEncomenda.master" AutoEventWireup="true" CodeFile="Default.aspx.cs" Inherits="Site_Default" %>
+
+<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" Runat="Server">
+<html>
+    <head>
+        <title>Four divs</title>
+        <style>
+            #contenet {
+                width: 1024px;
+                margin: 30px;
+                padding: 10px;
+                overflow: hidden;
+            }
+            .box {
+                width: 200px;
+                float: left;
+                margin-right: 25px;
+                overflow: hidden;
+            }
+            .small_box {
+                border: 1px solid none;
+                background: red;
+                width: 200px;
+                height: 200px;
+                margin-bottom: 35px;
+            }
+        </style>
+
+    </head>
+    <body>
+        <div id="contenet">
+            <div class="box" align="justify">
+                <p><b>Registre-se agora! É totalmente gratis!</b></p>
+                <div class="small_box">
+                    <a href="/site/Cadastro.aspx" runat="server" id="hrefCadastro"><img src="/img/registre-se.jpg" width="200px" height="200px" /></a>
+                </div>
+            </div>
+         <div class="box" align="justify">
+                <p><b>Faça parte dessa nova idéia! Ajude a nossa comunidade! </b></p>
+                <div class="small_box">
+                    <img src="/img/comunidadeBoa.jpg" width="200px" height="200px" />
+                </div>
+            </div>
+         <div class="box" align="justify">
+                <p><b>Tenha todas as suas encomendas registradas em um único lugar! Simples, rapido e fácil de gerenciar!</b></p>
+                <div class="small_box">
+                    <img src="/img/encomendas.jpg" width="200px" height="200px" />
+                </div>
+            </div>
+         <div class="box" align="justify">
+                <p><b>Ajude-nos a melhorar nosso site! Envie sua sugestão dúvida através do nosso fomulário de contato!</b></p>
+                <div class="small_box">
+                    <a href="/site/contato.aspx"><img src="/img/contato.jpg" width="200px" height="200px" /></a>
+                </div>
+            </div>
+        </div> 
+    </body>
+</html>
+</asp:Content>
+

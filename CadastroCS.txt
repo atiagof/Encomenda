@@ -1,0 +1,104 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+using System.Data.SqlClient;
+using System.Configuration;
+using System.Drawing;
+using System.Net.Mail;
+
+public partial class Site_Default2 : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+
+    }
+    protected void btnSubmeter_Click(object sender, EventArgs e)
+    {
+        //Recupera os itens do formulario e monta a model para envio para camada Bussines
+        UsuarioEntidade usuario = new UsuarioEntidade();
+
+        usuario.nome = txtNome.Text;
+        usuario.email = txtEmail.Text;
+        usuario.endereco = txtEndereco.Text;
+        usuario.bairro = txtBairro.Text;
+
+        if (string.IsNullOrEmpty(txtNum.Text))
+        {
+            txtNum.Text = "0";
+        }
+
+        usuario.numero = Convert.ToInt32(txtNum.Text);
+        usuario.senha = pass.Text;
+        usuario.telefone = txtTelefone.Text;
+        usuario.cidade = txtCidade.Text;
+        usuario.estado = ddlEstado.SelectedItem.Value;
+        usuario.cep = txtCEP.Text;
+
+        // Chama método da busines responsavel por mais alguma validação nos valaores enviados.
+        CadastrarUsuarioNegocio InsereUsuario = new CadastrarUsuarioNegocio();
+
+        //Antes de cadastrar verifica se o e-mail já está cadastrado na base
+        bool retornoUsuario = this.ConfirmaCadastro(usuario);
+
+        if (!retornoUsuario)
+        {
+
+            // Cria variável de retorno do insert BD
+            int RetornoInsert = -1;
+
+            //Caso retorne diferente de -1 o inserte foi efetuado
+            RetornoInsert = InsereUsuario.InsereUsuario(usuario);
+
+            if (RetornoInsert != -1)
+            {
+                this.LimpaControles();
+                // Mensagem alterada devido não possibilidade de teste no envio de e-mail durante o desenvolvimento.
+                //Response.Write("<script language='javascript'>alert('E-mail enviado com sucesso! Foi encaminhado um e-mail para:" + usuario.email + " com os dados de acesso.');</script>");
+                Response.Write("<script language='javascript'>alert('Cadastro efetuado com sucesso! Anote seus dados de acesso! Usuario:" + usuario.email + " Senha:" + usuario.senha + "');location.href='/Site/Login.aspx';</script>");
+            }
+            else
+            {
+                this.LimpaControles();
+                // Msg exibida Caso apresente algum erro durante o insert no BD
+                Response.Write("<script language='javascript'>alert('Erro na operação falha durante o cadastro! Contate o suporte.');location.href='/Site/Login.aspx;</script>");
+            }
+        }
+        else
+        {
+            this.LimpaControles();
+            Response.Write("<script language='javascript'>alert('Erro na operação! O email já se encontra cadastrado tente recuperar sua senha ou se cadastre com um novo e-mail.');location.href='/Site/Login.aspx';</script>");
+        }
+    }
+
+    private bool ConfirmaCadastro(UsuarioEntidade usuarioCadastro)
+    {
+        bool UsuarioCadastrado = false;
+
+        // Efetua a cosulta no banco
+        CadastrarUsuarioNegocio consultaCadastroUsuario = new CadastrarUsuarioNegocio();
+
+        UsuarioCadastrado = consultaCadastroUsuario.ConfirmaCadastro(usuarioCadastro);
+
+        return UsuarioCadastrado;
+
+    }
+
+    private void LimpaControles()
+    {
+        txtNome.Text = string.Empty;
+        txtEmail.Text = string.Empty;
+        txtEndereco.Text = string.Empty;
+        txtBairro.Text = string.Empty;
+        txtCEP.Text = string.Empty;
+        txtTelefone.Text = string.Empty;
+        txtCidade.Text = string.Empty;
+        txtSenha2.Text = string.Empty;
+        pass.Text = string.Empty;
+        txtNum.Text = "0";
+        ddlEstado.SelectedIndex = 0;
+    }
+}
